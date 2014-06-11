@@ -136,7 +136,6 @@ var variantMapper = function(repo, readsetId, $scope) {
             data: JSON.stringify(reportSet),
             success: displayReports
         });
-        matchesSubmitted += 1;
     };
 
 
@@ -161,8 +160,9 @@ var variantMapper = function(repo, readsetId, $scope) {
             if (reportSet.reports.length) {
                 submitMatch(reportSet);
             } else {
-                matchesSubmitted += 1;
+                processedReportSets += 1;
             }
+            matchesSubmitted += 1;
         });
     };
 
