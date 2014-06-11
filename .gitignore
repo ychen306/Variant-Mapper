@@ -5,6 +5,7 @@ __pycache__/
 # C extensions
 *.so
 settings.py
+runserver.py
 # Distribution / packaging
 .Python
 env/
