@@ -1,0 +1,191 @@
+<html ng-app="VariantMapper">
+<head>
+<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Variant Mapper</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+    <script src="/static/variants.js"></script>
+    <script src="/static/main.js"></script>
+    <script src="/static/oboe.js"></script>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+</head>
+<body ng-controller="variantMapperController" ng-init='{{app_init|safe}} {{searchTerms}}'>
+	<style>
+		body {
+			font-family: "Trebuchet MS", Helvetica, sans-serif;
+		}
+		.table-hover {
+			cursor: pointer;
+		}
+		.attribuTe {
+			font-weight: bold;
+		}
+	</style>
+	<div id="nav-bar">
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="container-fluid">
+				<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="navbar-header">
+					<a class="navbar-brand">Variant Mapper</a>
+				</div>
+				<!-- Collect the nav links, forms, and other content for toggling -->
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="#" data-toggle="modal" data-target="#readset-menu">{{ "{{currentReadset.name}}" }}</a></li>
+					</ul>
+					<form class="navbar-form navbar-left" role="search" method="post" action="/">
+						<div class="form-group">
+							<input type="text" class="form-control" name="term" placeholder="Search term here" value="{{term}}">
+						</div>
+						<button type="submit" class="btn btn-default">Search</button>
+					</form>
+				</div>
+			</div>
+		</nav>
+	</div>
+	<div class="container" id="main">
+	{% if term %}
+		<div class="progress" ng-show="loadingReports">
+			<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{ '{{progress}}' }};">
+		    	{{ "{{stage}}" }} - {{ "{{progress}}" }}
+			</div>
+		</div>
+		<table class="table table-hover table-striped"  ng-show="matchedReports.length > 0">
+			<thead>
+				<tr>
+					<th>Title</th>
+					<th>Significance</th>
+					<th>Review Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="report in matchedReports" data-toggle="modal" data-target='#detail-{{"{{report.reportId}}"}}'>
+					<td>{{ "{{report.title}}" }}</td>
+					<td>{{ "{{report.clinicalSignificance}}" }}</td>
+					<td>{{ "{{report.reviewStatus}}" }}</td>
+				</tr>
+			</tbody>
+		</table>
+		<div ng-show="noReportsMatched()"><h1>No reports matched.</h1></div>
+	{% else %}
+		<div style="font-size: 20px;">
+			<h1>How to use me?</h1>
+			<p>1. Select a readset that belongs to human</p>
+			<p>2. Search for term that you are interested in using the search bar</p>
+		</div>
+	{% endif %}
+	</div>
+
+{% raw %}	
+	<div class="modal fade" id="readset-menu" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<nav class="navbar navbar-default" role="navigation">
+						<div class="container-fluid">
+							<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+								<ul class="nav navbar-nav">
+									<li class="dropdown">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{  currentRepo  }}<b class="caret"></b></a>
+										<ul class="dropdown-menu">
+											<li ng-repeat="(repo, _) in repositories" ng-click="switchRepo(repo)">
+												<a href="#">{{  repo  }}</a>
+											</li>
+										</ul>
+									</li>
+									<li class="dropdown">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{  currentDataset  }}<b class="caret"></b></a>
+										<ul class="dropdown-menu">
+											<li ng-repeat="(name, id) in repositories[currentRepo]" ng-click="switchDataset(name)">
+												<a href="#">{{  name  }}</a>
+											</li>
+										</ul>
+									</li>
+								</ul>
+								<form class="navbar-form navbar-left" role="search">
+									<div class="form-group">
+										<input type="text" class="form-control" placeholder="Search readset here" ng-model="readsetSearch">
+									</div>
+								</form>
+							</div>
+						</div>
+					</nav>
+				</div>
+				<div class="modal-body">
+					<h3>{{  currentReadset.name  }}</h3>
+					<table class="table table-condensed table-hover"> 
+						<thead>
+							<tr>
+								<th>Readset</th>
+								<th>Species</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="readset in readsets" ng-click="switchReadset(readset);">
+								<td>{{  readset.name  }}</td>
+								<td>{{  readset.species  }}</td>
+							</tr>
+						</tbody>
+					</table>
+					<ul class="pager">
+						<li ng-show="hasLastPage()" ng-click="loadPrevReadsets()"><a href="#">&larr; Last page</a></li>
+						<li ng-show="hasNextPage()" ng-click="loadNextReadsets()"><a href="#">Next page&rarr;</a></li>
+					</ul>
+				</div>
+				<div class="modal-footer">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div ng-repeat="report in matchedReports">
+		<div class="modal fade" id="detail-{{report.reportId}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+					<h3>{{report.title}}</h3>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-sm-1"></div>
+							<div class="col-sm-10">
+								<div class="row">
+									<div class="col-xs-5 attribute">Evaluated:</div>
+									<div class="col-xs-7 value">{{report.evaluated}}</div>
+									<hr></hr>
+								</div>
+								<div class="row">
+									<div class="col-xs-5 attribute">Review status:</div>
+									<div class="col-xs-7 value">{{report.reviewStatus}}}</div>
+									<hr></hr>
+								</div>
+								<div class="row">
+									<div class="col-xs-5 attribute">Clinical significance:</div>
+									<div class="col-xs-7 value">{{report.clinicalSignificance}}</div>
+									<hr></hr>
+								</div>
+								<div class="row">
+									<div class="col-xs-5 attribute">Gene:</div>
+									<div class="col-xs-7 value">{{report.gene}}</div>
+									<hr></hr>
+								</div>
+								<div class="row">
+									<div class="col-xs-5 attribute">Variation:</div>
+									<div class="col-xs-7 value">{{report.wholeVariation}}</div>
+									<hr></hr>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
+{% endraw %}

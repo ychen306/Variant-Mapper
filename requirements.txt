@@ -1,0 +1,6 @@
+flask
+requests
+-e git+https://github.com/i-trofimtschuk/frequests.git#egg=frequests
+simplejson
+pymongo
+ijson
