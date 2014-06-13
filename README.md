@@ -1,5 +1,4 @@
-Variant Mapper specifically written for GA4GH Read API
-
+Variant Mapper specifically written for the Read API of Global Alliance for Genomics and Health. This web application searches for reports filed by physicians and researches and compare those reports with a readset exposed by the Read API. A live server is running [here](http://192.241.244.189:7000). 
 ## Running the server
 
 ### Prerequisites
