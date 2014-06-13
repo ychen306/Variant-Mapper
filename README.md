@@ -10,7 +10,9 @@ $ pip install -r requirements.txt
 ```
 
 ### Configuration
-* Edit `settings.py.defalut` and set your own Mongodb settings. You will also need a Google API Key.
+* Edit `settings.py.defalut` and set your own Mongodb settings.
+* Set your own `SECRET_KEY`.
+* You will also need a Google API Key.
 * Save `settings.py.default` as `settings.py`
 
 ### Run the server

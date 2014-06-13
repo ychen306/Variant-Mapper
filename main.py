@@ -8,14 +8,14 @@ import simplejson as json
 import collections
 import re
 from functools import partial
-from settings import GOOGLE_API_KEY
+from settings import GOOGLE_API_KEY, SECRET_KEY
 from models import CachedReads
 from variant_mapper import match, get_ref_length
 
 monkey.patch_all()
 
 app = Flask(__name__)
-app.secret_key = '3B69607696501244C5516219551601DE0700FAD017B62E75527C2EA70C740C35'
+app.secret_key = SECRET_KEY
 
 REPOSITORIES = {
     'google': 'https://www.googleapis.com/genomics/v1beta/',
