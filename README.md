@@ -16,5 +16,5 @@ $ pip install -r requirements.txt
 ### Run the server
 * To run the server locally, use command below:
 ```
-$ python variant_mapper.py
+$ python main.py
 ```
