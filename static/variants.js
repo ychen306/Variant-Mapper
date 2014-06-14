@@ -172,7 +172,7 @@ var variantMapper = function(repo, readsetId, $scope) {
     return {
         map: function(term) {
             $scope.matchedReports = new Array();
-            var retMax = 100,
+            var retMax = 50,
                 searchUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&retmax='+retMax+'&term='+term,
                 trialUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&retmax=0&term='+term;
             $.getXML(trialUrl, function(initSearch) {
