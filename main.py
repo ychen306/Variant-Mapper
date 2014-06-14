@@ -12,7 +12,7 @@ from settings import GOOGLE_API_KEY, SECRET_KEY
 from models import CachedReads
 from variant_mapper import match, get_ref_length
 
-monkey.patch_all()
+monkey.patch_all(thread=False, select=False)
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -178,7 +178,7 @@ def match_reports():
                 break
 
     pool = Pool(50)
-    pool.imap_unordered(search_and_match, coord_indices)
+    pool.map(search_and_match, coord_indices.keys())
     pool.join()
 
     return Response(json.dumps(matched_reports), content_type='application/json; charset=UTF-8')

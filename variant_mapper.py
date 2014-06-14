@@ -106,7 +106,6 @@ def get_bases_from_hgvs(hgvs):
         bases = ''
     return bases
 
-
 def match(report, read):
     '''
     Check if a variation in a report mathces a read.
