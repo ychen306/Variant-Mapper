@@ -4,3 +4,4 @@ requests
 simplejson
 pymongo
 ijson
+gevent

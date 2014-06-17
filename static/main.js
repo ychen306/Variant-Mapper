@@ -5,7 +5,6 @@ variantMapperApp.controller('variantMapperController', function($scope){
 	$scope.repositories = datasets;
 	$scope.readsets = [];
 	$scope.pageTokens = [undefined];
-
 	var initRepo = function() {
 		for (var repo in datasets) {
 			$scope.currentRepo = repo;
@@ -84,6 +83,21 @@ variantMapperApp.controller('variantMapperController', function($scope){
 	$scope.noReportsMatched = function() {
 		return ($scope.loadingReports === false && (!$scope.matchedReports || $scope.matchedReports.length === 0));
 	}
+	$scope.canShow = function(report) {
+		if ($scope.sigFilter === undefined) 
+			return true;
+		return ($scope.sigFilter === report.clinicalSignificance)
+	}
+	$scope.showSigFilter = function() {
+		if ($scope.sigFilter === undefined) 
+			return "all"
+		else
+			return $scope.sigFilter;
+	}
+	$scope.setSigFilter = function(sig) {
+		$scope.sigFilter = sig;
+	}
+
 	if (!$scope.currentRepo) {
 		initRepo();	
 	}

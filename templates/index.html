@@ -27,11 +27,9 @@
 	<div id="nav-bar">
 		<nav class="navbar navbar-default" role="navigation">
 			<div class="container-fluid">
-				<!-- Brand and toggle get grouped for better mobile display -->
 				<div class="navbar-header">
 					<a class="navbar-brand">Variant Mapper</a>
 				</div>
-				<!-- Collect the nav links, forms, and other content for toggling -->
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav">
 						<li class="active"><a href="#" data-toggle="modal" data-target="#readset-menu">{{ "{{currentReadset.name}}" }}</a></li>
@@ -42,6 +40,25 @@
 						</div>
 						<button type="submit" class="btn btn-default">Search</button>
 					</form>
+					<ul class="nav navbar-nav">
+						<li class="dropdown" ng-show="matchedReports.length > 0">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+								Review status: {{ "{{showSigFilter()}}" }}<span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu">
+								<li class="significance-filter-option"><a href="#" ng-click="setSigFilter(undefined)">All</a></li>
+								<li class="significance-filter-option"><a href="#" ng-click="setSigFilter('Pathogenic')">Pathogenic</a></li>
+								<li class="significance-filter-option"><a href="#" ng-click="setSigFilter('Likely pathogenic')">Likely pathogenic</a></li>
+								<li class="significance-filter-option"><a href="#" ng-click="setSigFilter('Drug response')">Drug response</a></li>
+								<li class="significance-filter-option"><a href="#" ng-click="setSigFilter('Confers sensitivity')">Confers sensitivity</a></li>
+								<li class="significance-filter-option"><a href="#" ng-click="setSigFilter('Risk factor')">Risk factor</a></li>
+								<li class="significance-filter-option"><a href="#" ng-click="setSigFilter('Association')">Association</a></li>
+								<li class="significance-filter-option"><a href="#" ng-click="setSigFilter('Likely benign')">Likely benign</a></li>
+								<li class="significance-filter-option"><a href="#" ng-click="setSigFilter('Benign')">Benign</a></li>
+								<li class="significance-filter-option"><a href="#" ng-click="setSigFilter('Protective')">Protective</a></li>
+							</ul>
+						</li>
+					</ul>
 				</div>
 			</div>
 		</nav>
@@ -53,7 +70,7 @@
 		    	{{ "{{stage}}" }} - {{ "{{progress}}" }}
 			</div>
 		</div>
-		<table class="table table-hover table-striped"  ng-show="matchedReports.length > 0">
+		<table class="table table-hover"  ng-show="matchedReports.length > 0">
 			<thead>
 				<tr>
 					<th>Title</th>
@@ -62,7 +79,10 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="report in matchedReports" data-toggle="modal" data-target='#detail-{{"{{report.reportId}}"}}'>
+				<tr ng-repeat="report in matchedReports"
+					data-toggle="modal"
+					data-target='#detail-{{"{{report.reportId}}"}}'
+					ng-show="canShow(report)">
 					<td>{{ "{{report.title}}" }}</td>
 					<td>{{ "{{report.clinicalSignificance}}" }}</td>
 					<td>{{ "{{report.reviewStatus}}" }}</td>

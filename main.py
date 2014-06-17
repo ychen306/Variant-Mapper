@@ -2,17 +2,17 @@ from __future__ import division
 from flask import Flask, Response, request, render_template, session
 import ijson
 import requests
-from gevent.pool import Pool
-from gevent import monkey
 import simplejson as json
 import collections
 import re
+from gevent.pool import Pool
+from gevent import monkey as curious_george
 from functools import partial
 from settings import GOOGLE_API_KEY, SECRET_KEY
 from models import CachedReads
 from variant_mapper import match, get_ref_length
 
-monkey.patch_all(thread=False, select=False)
+curious_george.patch_all()
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -123,25 +123,42 @@ def ga_api(repo_id, endpoint):
 
 
 
+def lookup_and_match(info):
+    '''
+    Lookup a report in catch and match it if found
+    '''
+    report, repo, readset_id = info
+    matched = False
+    found = False
+    cached_read = find_cached_read(report, repo, readset_id)
+    if cached_read:
+        found = True
+        if match(report, cached_read):
+            matched = True
+    return found, matched, report
+
+
 @app.route('/match_reports', methods=['POST'])
 def match_reports():
     report_set = json.loads(request.data)
     coordinates = []
     coord_indices = {}
     matched_reports = []
+    matching_result = []
+    lookupPool = Pool(50)
 
-    for report in report_set['reports']:
+    for found, matched, report in lookupPool.imap(lookup_and_match, 
+                                        ((r, report_set['repository'], report_set['readsetId']) 
+                                            for r in report_set['reports'])):
         if report['clinicalSignificance'] in ('Uncertain significance', 'not provided', 'conflicting data from submitters', 'other'):
             continue
-        new_coord = Coordinate(report['chrom'], report['seqStart'], report['seqEnd'])
-        coordinates, coord_index = push_coordinates(coordinates, new_coord)
-        cached_read = find_cached_read(report, report_set['repository'], report_set['readsetId'])
-        if cached_read:
-            if match(report, cached_read):
-                matched_reports.append(report)
-        else:
-            #look it up with read search API
+        if not found:
+            new_coord = Coordinate(report['chrom'], report['seqStart'], report['seqEnd'])
+            coordinates, coord_index = push_coordinates(coordinates, new_coord)
             coord_indices.setdefault(coord_index, []).append(report)
+        elif matched:
+            matched_reports.append(report)
+
 
     read_search = partial(make_read_search,
                         report_set['repository'],
@@ -177,9 +194,8 @@ def match_reports():
             if len(reports_visited) >= len(reports):
                 break
 
-    pool = Pool(50)
-    pool.map(search_and_match, coord_indices.keys())
-    pool.join()
+    searchPool = Pool(50)
+    (_ for _ in searchPool.imap(search_and_match, coord_indices.keys()))
 
     return Response(json.dumps(matched_reports), content_type='application/json; charset=UTF-8')
 
