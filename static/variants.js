@@ -134,7 +134,12 @@ var variantMapper = function(repo, readsetId, $scope) {
                 request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
             },
             data: JSON.stringify(reportSet),
-            success: displayReports
+            success: displayReports,
+            error: function() {
+                setTimeout(function() {
+                    submitMatch(reportSet);
+                }, 10000);
+            }
         });
     };
 
