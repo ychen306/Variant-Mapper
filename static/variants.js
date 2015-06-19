@@ -1,6 +1,6 @@
 datasets = {
     'Google': {
-        '1000 Genomes': '376902546192',
+        '1000 Genomes': '10473108253681171589',
         'DREAM SMC Challenge': '337315832689',
         'PGP': '383928317087',
         'Simons Foundation' : '461916304629'
